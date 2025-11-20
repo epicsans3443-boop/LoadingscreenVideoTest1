@@ -43,7 +43,6 @@
             width: auto;
             height: auto;
             transform: translateX(-50%) translateY(-50%);
-            filter: brightness(60%) blur(1px);
         }
 
         #loading-overlay {
@@ -92,7 +91,7 @@
 </head>
 <body>
 
-    <!-- Video de fondo en WebM -->
+    <!-- Video de fondo en WebM (HD, VP8) -->
     <div id="video-container">
         <video
             id="background-video"
@@ -104,7 +103,7 @@
             poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
             onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el video (Codec/404/MIME).'; console.error('Error cargando el video.');"
         >
-            <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted.webm" type="video/webm">
+            <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted_hd.webm" type="video/webm">
             Tu navegador no soporta el tag de video.
         </video>
     </div>
