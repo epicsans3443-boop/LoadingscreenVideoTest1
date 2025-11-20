@@ -7,28 +7,23 @@
     <!-- Carga de Tailwind CSS para un estilizado rápido y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Define la fuente Inter y el estilo general */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        
+
         :root {
-            --gmod-primary: #f59e0b; /* Color naranja de GMod o similar */
+            --gmod-primary: #f59e0b;
             --gmod-text-shadow: 0 0 15px rgba(0, 0, 0, 0.75);
         }
 
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            overflow: hidden; /* Evita barras de desplazamiento */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #000; /* Fondo negro por si el video tarda en cargar */
+            background-color: #000;
         }
-
-        /* ----------------------------------------------------- */
-        /* ESTILO DEL VIDEO DE FONDO (CRÍTICO) */
-        /* ----------------------------------------------------- */
 
         #video-container {
             position: fixed;
@@ -44,18 +39,13 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            /* El truco: cubre el área, recorta si es necesario, mantiene aspecto */
             min-width: 100%;
             min-height: 100%;
             width: auto;
             height: auto;
             transform: translateX(-50%) translateY(-50%);
-            filter: brightness(60%) blur(1px); /* Oscurece y desenfoca ligeramente para mejorar la legibilidad del texto */
+            filter: brightness(60%) blur(1px);
         }
-
-        /* ----------------------------------------------------- */
-        /* ESTILO DE LA CAPA SUPERIOR (OVERLAY) */
-        /* ----------------------------------------------------- */
 
         #loading-overlay {
             position: relative;
@@ -71,7 +61,7 @@
             font-weight: 700;
             text-shadow: var(--gmod-text-shadow);
             margin-bottom: 0.5rem;
-            min-height: 24px; /* Evita CLS al actualizar el texto */
+            min-height: 24px;
         }
 
         .messages {
@@ -83,7 +73,6 @@
             min-height: 16px;
         }
 
-        /* BARRA DE CARGA */
         #loading-bar-outer {
             width: 100%;
             height: 10px;
@@ -95,16 +84,16 @@
 
         .loading-bar {
             height: 100%;
-            width: 0%; /* Inicia en 0% (vacía) */
+            width: 0%;
             background-color: var(--gmod-primary);
             border-radius: 5px;
-            transition: width 0.3s ease-out; /* Animación suave del progreso */
+            transition: width 0.3s ease-out;
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. ELEMENTO DE VIDEO DE FONDO (USANDO MP4 DE PERFIL BASELINE) -->
+    <!-- Video de fondo en WebM -->
     <div id="video-container">
         <video
             id="background-video"
@@ -116,80 +105,53 @@
             poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
             onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el video (Codec/404/MIME).'; console.error('Error cargando el video.');"
         >
-            <!-- 
-                *** URL DE GITHUB PAGES DEL VIDEO COMPRIMIDO (BASELINE PROFILE) ***
-            -->
-            <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted.mp4" type="video/mp4">
+            <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted.webm" type="video/webm">
             Tu navegador no soporta el tag de video.
         </video>
     </div>
 
-    <!-- 2. ELEMENTO DE AUDIO DE FONDO (PARA MÚSICA) -->
+    <!-- Audio de fondo -->
     <audio id="background-audio" autoplay loop>
-        <!-- 
-            *** RUTA DEL ARCHIVO DE AUDIO ***
-        -->
         <source src="./epic_hns_video_audio.mp3" type="audio/mpeg">
         <source src="./epic_hns_video_audio.ogg" type="audio/ogg">
         Tu navegador no soporta el audio.
     </audio>
 
-    <!-- 3. CAPA DE CONTENIDO (Overlay) -->
+    <!-- Overlay con estado de carga -->
     <div id="loading-overlay">
-        <!-- Título principal -->
         <h1 class="text-4xl sm:text-6xl font-black mb-10 text-cyan-400" style="text-shadow: 0 0 20px rgba(0,0,0,1);">
             EPIC'S <span class="text-white">HIDE AND SEEK</span>
         </h1>
 
-        <!-- Contenedor de estado y progreso -->
         <div class="bg-gray-800/80 p-6 rounded-xl shadow-2xl backdrop-blur-sm">
-            
-            <!-- Estado actual de la carga -->
-            <p class="status" id="loading-status">
-                Inicializando...
-            </p>
+            <p class="status" id="loading-status">Inicializando...</p>
 
-            <!-- Mensaje de error (oculto por defecto) -->
             <p id="video-error-message" class="text-sm mt-3 bg-red-800/70 p-1 rounded-md text-red-400 font-bold" style="display:none; text-shadow:none;">
                 ⚠️ ERROR: No se pudo cargar el video.
             </p>
 
-            <!-- Barra de progreso -->
             <div id="loading-bar-outer">
                 <div class="loading-bar" id="loading-progress"></div>
             </div>
 
-            <!-- Archivos y mensajes -->
-            <p class="text-sm mt-3 opacity-75" id="file-needed-count">
-                Descargando 0 de 0 archivos.
-            </p>
-            <p class="messages" id="loading-messages">
-                ¡Prepárate para la acción!
-            </p>
+            <p class="text-sm mt-3 opacity-75" id="file-needed-count">Descargando 0 de 0 archivos.</p>
+            <p class="messages" id="loading-messages">¡Prepárate para la acción!</p>
         </div>
-        
     </div>
 
-    <!-- 4. SCRIPT DE INTERFAZ DE GARRY'S MOD -->
+    <!-- Script de GMod -->
     <script>
-        // Referencias a los elementos del DOM
         const statusElement = document.getElementById('loading-status');
         const progressElement = document.getElementById('loading-progress');
         const messagesElement = document.getElementById('loading-messages');
         const fileCountElement = document.getElementById('file-needed-count');
         const audioElement = document.getElementById('background-audio');
 
-        // Variables de seguimiento
         let totalFilesNeeded = 0;
-        
-        // Función de utilidad para generar mensajes (simula mensajes dinámicos)
+
         function updateMessages(msg) {
             messagesElement.textContent = msg;
         }
-
-        // -----------------------------------------------------
-        // FUNCIONES LLAMADAS POR GARRY'S MOD (Bridge Functions)
-        // -----------------------------------------------------
 
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
         function SetFilesNeeded(needed) {
@@ -198,59 +160,39 @@
             statusElement.textContent = 'Preparando la descarga de archivos...';
         }
         function SetFilesTotal(total) { }
-        
         function DownloadingFile(fileName) {
             updateMessages(`Descargando: ${fileName}`);
         }
-        
         function SetProgress(progress) {
             const progressPercent = Math.round(progress);
             progressElement.style.width = `${progressPercent}%`;
-            
             if (totalFilesNeeded > 0) {
                 const downloadedFiles = Math.round((progressPercent / 100) * totalFilesNeeded);
                 fileCountElement.textContent = `Descargando ${downloadedFiles} de ${totalFilesNeeded} archivos.`;
             }
         }
-
-        function SetStatus(status) {
-            statusElement.textContent = status;
-        }
-
+        function SetStatus(status) { statusElement.textContent = status; }
         function SetSteamID(steamid) { }
-
         function PlaySong(url) {
             if (audioElement) {
-                if (url) {
-                    audioElement.src = url;
-                }
+                if (url) audioElement.src = url;
                 audioElement.play().catch(error => {
                     console.log("No se pudo iniciar la reproducción del audio automáticamente.");
                 });
             }
         }
-        
-        // -----------------------------------------------------
-        // Manejo de Interacción con el Audio y Video
-        // -----------------------------------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
             const videoElement = document.getElementById('background-video');
-
-            // Intenta reproducir el video (debe funcionar por estar mudo)
             if (videoElement) {
                 videoElement.play().catch(error => {
                     console.error("No se pudo iniciar la reproducción automática del video:", error);
-                    // Si falla, el error lo maneja el atributo 'onerror' de la etiqueta <video>
                 });
             }
-
-            // Intenta reproducir el audio. (Puede fallar por políticas de navegador)
             audioElement.play().catch(error => {
                 console.log("Reproducción de audio bloqueada, el usuario deberá hacer clic si GMod lo permite.");
             });
         });
-
     </script>
 
 </body>
