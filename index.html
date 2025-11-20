@@ -114,12 +114,11 @@
             playsinline
             preload="auto"
             poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
-            onerror="document.getElementById('video-error-message').style.display='block'; console.error('Error cargando el video. Comprobar ruta y formato.');"
+            onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el archivo de video (404/MIME).'; console.error('Error cargando el video.');"
         >
             <!-- 
-                ******************************************************************
-                *** ¡CRÍTICO! URL ABSOLUTA DE GITHUB RAW PEGADA AQUÍ ***
-                ******************************************************************
+                *** URL ABSOLUTA DE GITHUB RAW PEGADA AQUÍ ***
+                Si esto falla, el problema es el códec H.264
             -->
             <source src="https://github.com/epicsans3443-boop/LoadingscreenVideoTest1/raw/refs/heads/main/epic_hns_video_muted.mp4" type="video/mp4">
             Tu navegador no soporta el tag de video.
@@ -129,9 +128,7 @@
     <!-- 2. ELEMENTO DE AUDIO DE FONDO (PARA MÚSICA) -->
     <audio id="background-audio" autoplay loop>
         <!-- 
-            ******************************************************************
-            *** IMPORTANTE: RUTA DEL ARCHIVO DE AUDIO (relativa si está en GitHub) ***
-            ******************************************************************
+            *** RUTA DEL ARCHIVO DE AUDIO ***
         -->
         <source src="./epic_hns_video_audio.mp3" type="audio/mpeg">
         <source src="./epic_hns_video_audio.ogg" type="audio/ogg">
@@ -195,73 +192,50 @@
         // -----------------------------------------------------
         // FUNCIONES LLAMADAS POR GARRY'S MOD (Bridge Functions)
         // -----------------------------------------------------
+        // (Las funciones GameDetails, SetFilesNeeded, etc., permanecen igual)
+        // ... (resto del código de GMod bridge) ...
 
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-            // Se puede usar aquí para mostrar detalles del servidor en el HTML
-        }
-
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
         function SetFilesNeeded(needed) {
             totalFilesNeeded = needed;
             fileCountElement.textContent = `Descargando 0 de ${totalFilesNeeded} archivos.`;
             statusElement.textContent = 'Preparando la descarga de archivos...';
         }
-
-        function SetFilesTotal(total) {
-            // Esto es redundante si se usa SetFilesNeeded, pero puede ser útil.
-        }
+        function SetFilesTotal(total) { }
         
         function DownloadingFile(fileName) {
-            // Muestra el archivo que se está descargando actualmente
             updateMessages(`Descargando: ${fileName}`);
         }
-
-        function SetFilesNeeded(needed) {
-            totalFilesNeeded = needed;
-            fileCountElement.textContent = `Descargando 0 de ${totalFilesNeeded} archivos.`;
-        }
-
+        
         function SetProgress(progress) {
-            // 'progress' es un valor de 0 a 100
             const progressPercent = Math.round(progress);
             progressElement.style.width = `${progressPercent}%`;
             
             if (totalFilesNeeded > 0) {
-                // Si tienes totalFilesNeeded, puedes calcular los archivos descargados
                 const downloadedFiles = Math.round((progressPercent / 100) * totalFilesNeeded);
                 fileCountElement.textContent = `Descargando ${downloadedFiles} de ${totalFilesNeeded} archivos.`;
             }
         }
 
         function SetStatus(status) {
-            // Actualiza el estado principal (e.g., "Connecting", "Sending Client Info", etc.)
             statusElement.textContent = status;
         }
 
-        function SetSteamID(steamid) {
-            // Muestra el SteamID o lo usa para fondos/música personalizados
-        }
+        function SetSteamID(steamid) { }
 
         function PlaySong(url) {
-            // GMod llama a esta función con la URL de la canción.
-            // Sobreescribimos la música que pusimos en el HTML.
-
             if (audioElement) {
-                // Si GMod envía una URL de canción, la usa
                 if (url) {
                     audioElement.src = url;
                 }
-                
-                // Intenta iniciar la reproducción, ya que GMod permite más control
                 audioElement.play().catch(error => {
                     console.log("No se pudo iniciar la reproducción del audio automáticamente.");
-                    // En caso de fallo, se recomienda dejar el audio en bucle
-                    // y cruzar los dedos para que se inicie al final de la carga.
                 });
             }
         }
-
+        
         // -----------------------------------------------------
-        // Manejo de Interacción con el Video y Audio
+        // Manejo de Interacción con el Video y Audio (¡CRÍTICO!)
         // -----------------------------------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -270,14 +244,22 @@
             // 1. Intenta reproducir el video (debe funcionar por estar mudo)
             videoElement.play().catch(error => {
                 console.error("No se pudo iniciar la reproducción automática del video:", error);
-                // Si el video falla, el onerror del HTML debería mostrar el mensaje de error.
+                // La etiqueta onerror de HTML maneja fallos directos (404)
             });
 
-            // 2. Intenta reproducir el audio. (Puede fallar si el navegador lo bloquea)
+            // 2. CHECK AGRESIVO DE CÓDEC: Si no se puede cargar el metadata en 3 segundos
+            setTimeout(() => {
+                // readyState < 3 significa que el navegador no pudo cargar suficiente data (al menos el primer frame)
+                if (videoElement.readyState < 3 && !videoElement.paused) {
+                    const errorMessage = document.getElementById('video-error-message');
+                    errorMessage.textContent = '⚠️ ERROR CRÍTICO: El códec del video NO es compatible (Debe ser H.264).';
+                    errorMessage.style.display = 'block';
+                }
+            }, 3000); // Dale 3 segundos para que se cargue
+
+            // 3. Intenta reproducir el audio. (Puede fallar)
             audioElement.play().catch(error => {
-                // Si falla la reproducción automática, dejamos que el usuario interactúe
-                // o que GMod use la función PlaySong más tarde.
-                console.log("Reproducción de audio bloqueada. Se iniciará cuando GMod lo permita.");
+                console.log("Reproducción de audio bloqueada.");
             });
         });
 
