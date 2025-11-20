@@ -117,11 +117,9 @@
             onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el archivo de video (404/MIME).'; console.error('Error cargando el video.');"
         >
             <!-- 
-                *** PRIORIDAD: WEBM (VP8/VP9) para máxima compatibilidad con GMod CEF ***
-                Recodifica el video a WebM y súbelo a GitHub.
+                *** URL ABSOLUTA DE GITHUB RAW PEGADA AQUÍ ***
+                Si esto falla, el problema es el códec H.264
             -->
-            <source src="https://github.com/epicsans3443-boop/LoadingscreenVideoTest1/raw/refs/heads/main/epic_hns_video_muted.webm" type="video/webm">
-            <!-- MP4 se mantiene como fallback (la versión H.264 recodificada) -->
             <source src="https://github.com/epicsans3443-boop/LoadingscreenVideoTest1/raw/refs/heads/main/epic_hns_video_muted.mp4" type="video/mp4">
             Tu navegador no soporta el tag de video.
         </video>
@@ -244,15 +242,12 @@
             console.log("DOM Cargado. Intentando reproducir multimedia.");
             
             // 1. Comprobación de compatibilidad con MIME Type (antes de intentar reproducir)
-            // Se comprueba si el navegador puede reproducir MP4 o WEBM
-            const canPlayMp4 = videoElement.canPlayType('video/mp4');
-            const canPlayWebm = videoElement.canPlayType('video/webm');
-            
-            if (canPlayMp4 === 'no' && canPlayWebm === 'no') {
+            const canPlay = videoElement.canPlayType('video/mp4');
+            if (canPlay === 'no' || canPlay === '') {
                  const errorMessage = document.getElementById('video-error-message');
-                 errorMessage.textContent = '⚠️ ERROR: El navegador no soporta ni MP4 ni WEBM.';
+                 errorMessage.textContent = '⚠️ ERROR: El navegador no es compatible con el tipo de archivo MP4.';
                  errorMessage.style.display = 'block';
-                 console.error('El navegador no puede reproducir ningún tipo de video compatible.', canPlayMp4, canPlayWebm);
+                 console.error('El navegador no puede reproducir el tipo MP4.', canPlay);
                  return; // Detiene el intento de reproducción
             }
 
@@ -268,8 +263,7 @@
                 // readyState < 3 significa que el navegador no pudo cargar suficiente data (al menos el primer frame)
                 if (videoElement.readyState < 3 && !videoElement.paused) {
                     const errorMessage = document.getElementById('video-error-message');
-                    // Mensaje actualizado para reflejar la estrategia WEBM/MP4
-                    errorMessage.textContent = '⚠️ ERROR CRÍTICO: Ningún códec (WebM o MP4) es compatible.';
+                    errorMessage.textContent = '⚠️ ERROR CRÍTICO: El códec del video NO es compatible (Prueba con H.264 Perfil Base/Nivel 3.1).';
                     errorMessage.style.display = 'block';
                 }
             }, 3000); // Dale 3 segundos para que se cargue
