@@ -118,12 +118,10 @@
         >
             <!-- 
                 ******************************************************************
-                *** IMPORTANTE: RUTA RELATIVA AL VIDEO SUBIDO EN ESTE REPOSITORIO ***
+                *** ¡CRÍTICO! URL ABSOLUTA DE GITHUB RAW PEGADA AQUÍ ***
                 ******************************************************************
-                
-                ¡RUTA ACTUALIZADA! Asegúrate de que el archivo de video se llame 'epic_hns_video_muted.mp4'.
             -->
-            <source src="./epic_hns_video_muted.mp4" type="video/mp4">
+            <source src="https://github.com/epicsans3443-boop/LoadingscreenVideoTest1/raw/refs/heads/main/epic_hns_video_muted.mp4" type="video/mp4">
             Tu navegador no soporta el tag de video.
         </video>
     </div>
@@ -132,10 +130,8 @@
     <audio id="background-audio" autoplay loop>
         <!-- 
             ******************************************************************
-            *** IMPORTANTE: RUTA DEL ARCHIVO DE AUDIO ***
+            *** IMPORTANTE: RUTA DEL ARCHIVO DE AUDIO (relativa si está en GitHub) ***
             ******************************************************************
-            
-            ¡RUTA ACTUALIZADA! Asegúrate de que el archivo de audio se llame 'epic_hns_video_audio.mp3'.
         -->
         <source src="./epic_hns_video_audio.mp3" type="audio/mpeg">
         <source src="./epic_hns_video_audio.ogg" type="audio/ogg">
@@ -158,8 +154,8 @@
             </p>
 
             <!-- Mensaje de error de video (oculto por defecto) -->
-            <p id="video-error-message" class="text-sm mt-3 text-red-400 font-bold" style="display:none; text-shadow:none;">
-                ⚠️ ERROR: Video de fondo no encontrado o formato incompatible.
+            <p id="video-error-message" class="text-sm mt-3 bg-red-800/70 p-1 rounded-md text-red-400 font-bold" style="display:none; text-shadow:none;">
+                ⚠️ ERROR: Video de fondo no encontrado, ruta incorrecta, o formato incompatible.
             </p>
 
             <!-- Barra de progreso -->
