@@ -30,8 +30,18 @@
         /* ESTILO DEL VIDEO DE FONDO (CRÍTICO) */
         /* ----------------------------------------------------- */
 
-        #background-video {
+        #video-container {
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        #background-video {
+            position: absolute;
             top: 50%;
             left: 50%;
             /* El truco: cubre el área, recorta si es necesario, mantiene aspecto */
@@ -40,7 +50,6 @@
             width: auto;
             height: auto;
             transform: translateX(-50%) translateY(-50%);
-            z-index: -1; /* Mantenlo detrás de todo */
             filter: brightness(60%) blur(1px); /* Oscurece y desenfoca ligeramente para mejorar la legibilidad del texto */
         }
 
@@ -96,25 +105,28 @@
 <body>
 
     <!-- 1. ELEMENTO DE VIDEO DE FONDO (Permanece mudo para autoplay garantizado) -->
-    <video
-        id="background-video"
-        autoplay
-        loop
-        muted
-        playsinline
-        preload="auto"
-        poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
-    >
-        <!-- 
-            ******************************************************************
-            *** IMPORTANTE: RUTA RELATIVA AL VIDEO SUBIDO EN ESTE REPOSITORIO ***
-            ******************************************************************
-            
-            ¡RUTA ACTUALIZADA! Asegúrate de que el archivo de video se llame 'epic_hns_video_muted.mp4'.
-        -->
-        <source src="./epic_hns_video_muted.mp4" type="video/mp4">
-        Tu navegador no soporta el tag de video.
-    </video>
+    <div id="video-container">
+        <video
+            id="background-video"
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+            poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
+            onerror="document.getElementById('video-error-message').style.display='block'; console.error('Error cargando el video. Comprobar ruta y formato.');"
+        >
+            <!-- 
+                ******************************************************************
+                *** IMPORTANTE: RUTA RELATIVA AL VIDEO SUBIDO EN ESTE REPOSITORIO ***
+                ******************************************************************
+                
+                ¡RUTA ACTUALIZADA! Asegúrate de que el archivo de video se llame 'epic_hns_video_muted.mp4'.
+            -->
+            <source src="./epic_hns_video_muted.mp4" type="video/mp4">
+            Tu navegador no soporta el tag de video.
+        </video>
+    </div>
 
     <!-- 2. ELEMENTO DE AUDIO DE FONDO (PARA MÚSICA) -->
     <audio id="background-audio" autoplay loop>
@@ -145,6 +157,11 @@
                 Inicializando...
             </p>
 
+            <!-- Mensaje de error de video (oculto por defecto) -->
+            <p id="video-error-message" class="text-sm mt-3 text-red-400 font-bold" style="display:none; text-shadow:none;">
+                ⚠️ ERROR: Video de fondo no encontrado o formato incompatible.
+            </p>
+
             <!-- Barra de progreso -->
             <div id="loading-bar-outer">
                 <div class="loading-bar" id="loading-progress"></div>
@@ -169,6 +186,7 @@
         const messagesElement = document.getElementById('loading-messages');
         const fileCountElement = document.getElementById('file-needed-count');
         const audioElement = document.getElementById('background-audio');
+        const videoElement = document.getElementById('background-video');
 
         // Variables de seguimiento
         let totalFilesNeeded = 0;
@@ -251,11 +269,12 @@
         // -----------------------------------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
-            const video = document.getElementById('background-video');
+            console.log("DOM Cargado. Intentando reproducir multimedia.");
             
             // 1. Intenta reproducir el video (debe funcionar por estar mudo)
-            video.play().catch(error => {
-                console.log("No se pudo iniciar la reproducción automática del video.");
+            videoElement.play().catch(error => {
+                console.error("No se pudo iniciar la reproducción automática del video:", error);
+                // Si el video falla, el onerror del HTML debería mostrar el mensaje de error.
             });
 
             // 2. Intenta reproducir el audio. (Puede fallar si el navegador lo bloquea)
