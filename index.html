@@ -117,10 +117,10 @@
             onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el archivo de video (404/MIME).'; console.error('Error cargando el video.');"
         >
             <!-- 
-                *** URL ABSOLUTA DE GITHUB RAW PEGADA AQUÍ ***
-                Si esto falla, el problema es el códec H.264
+                *** URL DE GITHUB PAGES DEL VIDEO - FINAL FIX ***
+                La URL de Pages garantiza que se envíe la cabecera correcta (Content-Type: video/mp4)
             -->
-            <source src="https://github.com/epicsans3443-boop/LoadingscreenVideoTest1/raw/refs/heads/main/epic_hns_video_muted.mp4" type="video/mp4">
+            <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted.mp4" type="video/mp4">
             Tu navegador no soporta el tag de video.
         </video>
     </div>
@@ -275,6 +275,3 @@
         });
 
     </script>
-
-</body>
-</html>
