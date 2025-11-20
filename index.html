@@ -85,13 +85,13 @@
             width: 0%;
             background-color: var(--gmod-primary);
             border-radius: 5px;
-            transition: width 0.3s ease-out;
+            transition: width 0.2s ease-out;
         }
     </style>
 </head>
 <body>
 
-    <!-- Video de fondo en WebM (HD, VP8) -->
+    <!-- Video de fondo -->
     <div id="video-container">
         <video
             id="background-video"
@@ -137,7 +137,7 @@
         </div>
     </div>
 
-    <!-- Script de GMod -->
+    <!-- Script de GMod con barra funcional -->
     <script>
         const statusElement = document.getElementById('loading-status');
         const progressElement = document.getElementById('loading-progress');
@@ -146,31 +146,48 @@
         const audioElement = document.getElementById('background-audio');
 
         let totalFilesNeeded = 0;
+        let downloadedFiles = 0;
 
-        function updateMessages(msg) {
-            messagesElement.textContent = msg;
-        }
-
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
-        function SetFilesNeeded(needed) {
-            totalFilesNeeded = needed;
-            fileCountElement.textContent = `Descargando 0 de ${totalFilesNeeded} archivos.`;
-            statusElement.textContent = 'Preparando la descarga de archivos...';
-        }
-        function SetFilesTotal(total) { }
-        function DownloadingFile(fileName) {
-            updateMessages(`Descargando: ${fileName}`);
-        }
-        function SetProgress(progress) {
-            const progressPercent = Math.round(progress);
-            progressElement.style.width = `${progressPercent}%`;
-            if (totalFilesNeeded > 0) {
-                const downloadedFiles = Math.round((progressPercent / 100) * totalFilesNeeded);
-                fileCountElement.textContent = `Descargando ${downloadedFiles} de ${totalFilesNeeded} archivos.`;
+        function updateFileCount(currentFileName = '') {
+            if(totalFilesNeeded > 0) {
+                fileCountElement.textContent = `Descargando ${downloadedFiles} de ${totalFilesNeeded} archivos${currentFileName ? ': ' + currentFileName : ''}`;
+            } else {
+                fileCountElement.textContent = `Descargando archivos...`;
             }
         }
+
+        function updateProgress() {
+            if(totalFilesNeeded === 0) return;
+            const percent = Math.round((downloadedFiles / totalFilesNeeded) * 100);
+            progressElement.style.width = percent + '%';
+        }
+
+        // Funciones llamadas por GMod
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
+
+        function SetFilesNeeded(needed) {
+            totalFilesNeeded = needed;
+            downloadedFiles = 0;
+            updateFileCount();
+            statusElement.textContent = 'Preparando la descarga de archivos...';
+        }
+
+        function SetFilesTotal(total) { }
+
+        function DownloadingFile(fileName) {
+            downloadedFiles++;
+            updateFileCount(fileName);
+            updateProgress();
+        }
+
+        function SetProgress(progress) {
+            progressElement.style.width = Math.round(progress) + '%';
+        }
+
         function SetStatus(status) { statusElement.textContent = status; }
+
         function SetSteamID(steamid) { }
+
         function PlaySong(url) {
             if (audioElement) {
                 if (url) audioElement.src = url;
