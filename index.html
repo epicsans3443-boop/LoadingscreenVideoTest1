@@ -104,7 +104,7 @@
 </head>
 <body>
 
-    <!-- 1. ELEMENTO DE VIDEO DE FONDO (Permanece mudo para autoplay garantizado) -->
+    <!-- 1. ELEMENTO DE VIDEO DE FONDO (USANDO MP4 DE PERFIL BASELINE) -->
     <div id="video-container">
         <video
             id="background-video"
@@ -114,11 +114,10 @@
             playsinline
             preload="auto"
             poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
-            onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el archivo de video (404/MIME).'; console.error('Error cargando el video.');"
+            onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el video (Codec/404/MIME).'; console.error('Error cargando el video.');"
         >
             <!-- 
-                *** URL DE GITHUB PAGES DEL VIDEO - FINAL FIX ***
-                La URL de Pages garantiza que se envíe la cabecera correcta (Content-Type: video/mp4)
+                *** URL DE GITHUB PAGES DEL VIDEO COMPRIMIDO (BASELINE PROFILE) ***
             -->
             <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted.mp4" type="video/mp4">
             Tu navegador no soporta el tag de video.
@@ -150,9 +149,9 @@
                 Inicializando...
             </p>
 
-            <!-- Mensaje de error de video (oculto por defecto) -->
+            <!-- Mensaje de error (oculto por defecto) -->
             <p id="video-error-message" class="text-sm mt-3 bg-red-800/70 p-1 rounded-md text-red-400 font-bold" style="display:none; text-shadow:none;">
-                ⚠️ ERROR: Video de fondo no encontrado, ruta incorrecta, o formato incompatible.
+                ⚠️ ERROR: No se pudo cargar el video.
             </p>
 
             <!-- Barra de progreso -->
@@ -179,7 +178,6 @@
         const messagesElement = document.getElementById('loading-messages');
         const fileCountElement = document.getElementById('file-needed-count');
         const audioElement = document.getElementById('background-audio');
-        const videoElement = document.getElementById('background-video');
 
         // Variables de seguimiento
         let totalFilesNeeded = 0;
@@ -192,8 +190,6 @@
         // -----------------------------------------------------
         // FUNCIONES LLAMADAS POR GARRY'S MOD (Bridge Functions)
         // -----------------------------------------------------
-        // (Las funciones GameDetails, SetFilesNeeded, etc., permanecen igual)
-        // ... (resto del código de GMod bridge) ...
 
         function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
         function SetFilesNeeded(needed) {
@@ -235,43 +231,27 @@
         }
         
         // -----------------------------------------------------
-        // Manejo de Interacción con el Video y Audio (¡CRÍTICO!)
+        // Manejo de Interacción con el Audio y Video
         // -----------------------------------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM Cargado. Intentando reproducir multimedia.");
-            
-            // 1. Comprobación de compatibilidad con MIME Type (antes de intentar reproducir)
-            const canPlay = videoElement.canPlayType('video/mp4');
-            if (canPlay === 'no' || canPlay === '') {
-                 const errorMessage = document.getElementById('video-error-message');
-                 errorMessage.textContent = '⚠️ ERROR: El navegador no es compatible con el tipo de archivo MP4.';
-                 errorMessage.style.display = 'block';
-                 console.error('El navegador no puede reproducir el tipo MP4.', canPlay);
-                 return; // Detiene el intento de reproducción
+            const videoElement = document.getElementById('background-video');
+
+            // Intenta reproducir el video (debe funcionar por estar mudo)
+            if (videoElement) {
+                videoElement.play().catch(error => {
+                    console.error("No se pudo iniciar la reproducción automática del video:", error);
+                    // Si falla, el error lo maneja el atributo 'onerror' de la etiqueta <video>
+                });
             }
 
-
-            // 2. Intenta reproducir el video (debe funcionar por estar mudo)
-            videoElement.play().catch(error => {
-                console.error("No se pudo iniciar la reproducción automática del video:", error);
-                // La etiqueta onerror de HTML maneja fallos directos (404)
-            });
-
-            // 3. CHECK AGRESIVO DE CÓDEC: Si no se puede cargar el metadata en 3 segundos
-            setTimeout(() => {
-                // readyState < 3 significa que el navegador no pudo cargar suficiente data (al menos el primer frame)
-                if (videoElement.readyState < 3 && !videoElement.paused) {
-                    const errorMessage = document.getElementById('video-error-message');
-                    errorMessage.textContent = '⚠️ ERROR CRÍTICO: El códec del video NO es compatible (Prueba con H.264 Perfil Base/Nivel 3.1).';
-                    errorMessage.style.display = 'block';
-                }
-            }, 3000); // Dale 3 segundos para que se cargue
-
-            // 4. Intenta reproducir el audio. (Puede fallar)
+            // Intenta reproducir el audio. (Puede fallar por políticas de navegador)
             audioElement.play().catch(error => {
-                console.log("Reproducción de audio bloqueada.");
+                console.log("Reproducción de audio bloqueada, el usuario deberá hacer clic si GMod lo permite.");
             });
         });
 
     </script>
+
+</body>
+</html>
