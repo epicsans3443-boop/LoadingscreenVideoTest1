@@ -241,23 +241,34 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log("DOM Cargado. Intentando reproducir multimedia.");
             
-            // 1. Intenta reproducir el video (debe funcionar por estar mudo)
+            // 1. Comprobación de compatibilidad con MIME Type (antes de intentar reproducir)
+            const canPlay = videoElement.canPlayType('video/mp4');
+            if (canPlay === 'no' || canPlay === '') {
+                 const errorMessage = document.getElementById('video-error-message');
+                 errorMessage.textContent = '⚠️ ERROR: El navegador no es compatible con el tipo de archivo MP4.';
+                 errorMessage.style.display = 'block';
+                 console.error('El navegador no puede reproducir el tipo MP4.', canPlay);
+                 return; // Detiene el intento de reproducción
+            }
+
+
+            // 2. Intenta reproducir el video (debe funcionar por estar mudo)
             videoElement.play().catch(error => {
                 console.error("No se pudo iniciar la reproducción automática del video:", error);
                 // La etiqueta onerror de HTML maneja fallos directos (404)
             });
 
-            // 2. CHECK AGRESIVO DE CÓDEC: Si no se puede cargar el metadata en 3 segundos
+            // 3. CHECK AGRESIVO DE CÓDEC: Si no se puede cargar el metadata en 3 segundos
             setTimeout(() => {
                 // readyState < 3 significa que el navegador no pudo cargar suficiente data (al menos el primer frame)
                 if (videoElement.readyState < 3 && !videoElement.paused) {
                     const errorMessage = document.getElementById('video-error-message');
-                    errorMessage.textContent = '⚠️ ERROR CRÍTICO: El códec del video NO es compatible (Debe ser H.264).';
+                    errorMessage.textContent = '⚠️ ERROR CRÍTICO: El códec del video NO es compatible (Prueba con H.264 Perfil Base/Nivel 3.1).';
                     errorMessage.style.display = 'block';
                 }
             }, 3000); // Dale 3 segundos para que se cargue
 
-            // 3. Intenta reproducir el audio. (Puede fallar)
+            // 4. Intenta reproducir el audio. (Puede fallar)
             audioElement.play().catch(error => {
                 console.log("Reproducción de audio bloqueada.");
             });
