@@ -119,7 +119,7 @@
             EPIC'S <span class="text-white">HIDE AND SEEK</span>
         </h1>
 
-        <div class="bg-gray-800/80 p-6 rounded-xl shadow-2xl backdrop-blur-sm">
+        <div class="bg-gray-800/80 p-6 rounded-xl shadow-2xl">
             <p class="status" id="loading-status">Inicializando...</p>
 
             <div id="loading-bar-outer">
@@ -132,68 +132,56 @@
     </div>
 
     <script>
-        let totalFiles = 0;
-        let neededFiles = 0;
-
-        const statusElement = document.getElementById('loading-status');
+        let progress = 0;
         const progressElement = document.getElementById('loading-progress');
+        const statusElement = document.getElementById('loading-status');
         const messagesElement = document.getElementById('loading-messages');
-        const fileCountElement = document.getElementById('file-needed-count');
-        const audioElement = document.getElementById('background-audio');
 
-        // ---------------------------
-        // FUNCIONES OFICIALES DE GMOD
-        -----------------------------
-
-        function SetFilesTotal(total) {
-            totalFiles = total;
-            updateProgress();
+        // Actualiza barra suavemente
+        function updateBar(target) {
+            let step = 0.5; // velocidad de llenado
+            let interval = setInterval(() => {
+                if(progress >= target) {
+                    progress = target;
+                    clearInterval(interval);
+                } else {
+                    progress += step;
+                }
+                progressElement.style.width = progress + '%';
+            }, 20);
         }
 
-        function SetFilesNeeded(needed) {
-            neededFiles = needed;
-            updateProgress();
+        // Funciones que GMod llama con WorkshopDL
+        function SetStatus(text) {
+            statusElement.textContent = text;
+
+            // Porcentaje aproximado según texto
+            let target = 0;
+            text = text.toLowerCase();
+            if(text.includes("workshop")) target = 50;
+            else if(text.includes("mapa")) target = 80;
+            else if(text.includes("finalizando")) target = 100;
+
+            updateBar(target);
         }
 
         function DownloadingFile(fileName) {
-            messagesElement.textContent = "Descargando: " + fileName;
+            messagesElement.textContent = `Descargando: ${fileName}`;
         }
 
-        function SetStatus(status) {
-            statusElement.textContent = status;
-        }
+        // Funciones vacías para compatibilidad
+        function SetFilesTotal() {}
+        function SetFilesNeeded() {}
+        function GameDetails() {}
+        function SetSteamID() {}
+        function PlaySong(url) {}
 
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {}
-
-        function SetSteamID(steamid) {}
-
-        function PlaySong(url) {
-            if (audioElement) {
-                if (url) audioElement.src = url;
-                audioElement.play().catch(() => {});
-            }
-        }
-
-        // ---------------------------
-        // CÁLCULO REAL DEL PROGRESO
-        -----------------------------
-        function updateProgress() {
-            if (totalFiles <= 0) {
-                progressElement.style.width = "0%";
-                return;
-            }
-
-            let percent = Math.round(100 * (1 - (neededFiles / totalFiles)));
-
-            progressElement.style.width = percent + "%";
-            fileCountElement.textContent = `Cargando: ${percent}%`;
-        }
-
-        // Asegurar reproducción
+        // Reproducir video y audio
         document.addEventListener('DOMContentLoaded', () => {
             const video = document.getElementById('background-video');
             video.play().catch(() => {});
-            audioElement.play().catch(() => {});
+            const audio = document.getElementById('background-audio');
+            audio.play().catch(() => {});
         });
     </script>
 
