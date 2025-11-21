@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garry's Mod Loading Screen - Video Background</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -77,7 +78,6 @@
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .loading-bar {
@@ -101,21 +101,19 @@
             playsinline
             preload="auto"
             poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
-            onerror="document.getElementById('video-error-message').style.display='block'; document.getElementById('video-error-message').textContent = '⚠️ ERROR: Falla al cargar el video (Codec/404/MIME).'; console.error('Error cargando el video.');"
         >
             <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted_hd.webm" type="video/webm">
             Tu navegador no soporta el tag de video.
         </video>
     </div>
 
-    <!-- Audio de fondo -->
+    <!-- Audio -->
     <audio id="background-audio" autoplay loop>
         <source src="./epic_hns_video_audio.mp3" type="audio/mpeg">
         <source src="./epic_hns_video_audio.ogg" type="audio/ogg">
-        Tu navegador no soporta el audio.
     </audio>
 
-    <!-- Overlay con estado de carga -->
+    <!-- Overlay -->
     <div id="loading-overlay">
         <h1 class="text-4xl sm:text-6xl font-black mb-10 text-cyan-400" style="text-shadow: 0 0 20px rgba(0,0,0,1);">
             EPIC'S <span class="text-white">HIDE AND SEEK</span>
@@ -123,10 +121,6 @@
 
         <div class="bg-gray-800/80 p-6 rounded-xl shadow-2xl backdrop-blur-sm">
             <p class="status" id="loading-status">Inicializando...</p>
-
-            <p id="video-error-message" class="text-sm mt-3 bg-red-800/70 p-1 rounded-md text-red-400 font-bold" style="display:none; text-shadow:none;">
-                ⚠️ ERROR: No se pudo cargar el video.
-            </p>
 
             <div id="loading-bar-outer">
                 <div class="loading-bar" id="loading-progress"></div>
@@ -137,53 +131,68 @@
         </div>
     </div>
 
-    <!-- Script de GMod con barra sincronizada -->
     <script>
+        let totalFiles = 0;
+        let neededFiles = 0;
+
         const statusElement = document.getElementById('loading-status');
         const progressElement = document.getElementById('loading-progress');
         const messagesElement = document.getElementById('loading-messages');
         const fileCountElement = document.getElementById('file-needed-count');
         const audioElement = document.getElementById('background-audio');
 
-        // ------------------------------
-        // Funciones de sincronización real con GMod
-        // ------------------------------
-        function SetProgress(progress) {
-            // progress = 0–100, proporcionado por GMod
-            const percent = Math.round(progress);
-            progressElement.style.width = percent + '%';
-            fileCountElement.textContent = `Cargando... ${percent}%`;
+        // ---------------------------
+        // FUNCIONES OFICIALES DE GMOD
+        -----------------------------
+
+        function SetFilesTotal(total) {
+            totalFiles = total;
+            updateProgress();
+        }
+
+        function SetFilesNeeded(needed) {
+            neededFiles = needed;
+            updateProgress();
+        }
+
+        function DownloadingFile(fileName) {
+            messagesElement.textContent = "Descargando: " + fileName;
         }
 
         function SetStatus(status) {
             statusElement.textContent = status;
         }
 
-        function SetFilesNeeded(needed) {
-            // Opcional: solo mostrar mensaje inicial
-            fileCountElement.textContent = `Cargando archivos...`;
-        }
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {}
 
-        function DownloadingFile(fileName) {
-            // Opcional: mostrar nombre de archivo actual sin afectar porcentaje
-            messagesElement.textContent = `Descargando: ${fileName}`;
-        }
+        function SetSteamID(steamid) {}
 
-        // Funciones adicionales de GMod
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
-        function SetFilesTotal(total) { }
-        function SetSteamID(steamid) { }
         function PlaySong(url) {
             if (audioElement) {
                 if (url) audioElement.src = url;
-                audioElement.play().catch(err => console.log("No se pudo reproducir audio automáticamente."));
+                audioElement.play().catch(() => {});
             }
         }
 
-        // Reproducción de video y audio
+        // ---------------------------
+        // CÁLCULO REAL DEL PROGRESO
+        -----------------------------
+        function updateProgress() {
+            if (totalFiles <= 0) {
+                progressElement.style.width = "0%";
+                return;
+            }
+
+            let percent = Math.round(100 * (1 - (neededFiles / totalFiles)));
+
+            progressElement.style.width = percent + "%";
+            fileCountElement.textContent = `Cargando: ${percent}%`;
+        }
+
+        // Asegurar reproducción
         document.addEventListener('DOMContentLoaded', () => {
-            const videoElement = document.getElementById('background-video');
-            if (videoElement) videoElement.play().catch(() => {});
+            const video = document.getElementById('background-video');
+            video.play().catch(() => {});
             audioElement.play().catch(() => {});
         });
     </script>
