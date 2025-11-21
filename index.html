@@ -85,7 +85,7 @@
             width: 0%;
             background-color: var(--gmod-primary);
             border-radius: 5px;
-            transition: width 0.2s ease-out;
+            transition: width 0.1s linear;
         }
     </style>
 </head>
@@ -132,12 +132,12 @@
                 <div class="loading-bar" id="loading-progress"></div>
             </div>
 
-            <p class="text-sm mt-3 opacity-75" id="file-needed-count">Descargando 0 de 0 archivos.</p>
+            <p class="text-sm mt-3 opacity-75" id="file-needed-count">Cargando...</p>
             <p class="messages" id="loading-messages">¡Prepárate para la acción!</p>
         </div>
     </div>
 
-    <!-- Script de GMod con barra funcional -->
+    <!-- Script de GMod con barra sincronizada -->
     <script>
         const statusElement = document.getElementById('loading-status');
         const progressElement = document.getElementById('loading-progress');
@@ -145,68 +145,46 @@
         const fileCountElement = document.getElementById('file-needed-count');
         const audioElement = document.getElementById('background-audio');
 
-        let totalFilesNeeded = 0;
-        let downloadedFiles = 0;
-
-        function updateFileCount(currentFileName = '') {
-            if(totalFilesNeeded > 0) {
-                fileCountElement.textContent = `Descargando ${downloadedFiles} de ${totalFilesNeeded} archivos${currentFileName ? ': ' + currentFileName : ''}`;
-            } else {
-                fileCountElement.textContent = `Descargando archivos...`;
-            }
-        }
-
-        function updateProgress() {
-            if(totalFilesNeeded === 0) return;
-            const percent = Math.round((downloadedFiles / totalFilesNeeded) * 100);
+        // ------------------------------
+        // Funciones de sincronización real con GMod
+        // ------------------------------
+        function SetProgress(progress) {
+            // progress = 0–100, proporcionado por GMod
+            const percent = Math.round(progress);
             progressElement.style.width = percent + '%';
+            fileCountElement.textContent = `Cargando... ${percent}%`;
         }
 
-        // Funciones llamadas por GMod
-        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
+        function SetStatus(status) {
+            statusElement.textContent = status;
+        }
 
         function SetFilesNeeded(needed) {
-            totalFilesNeeded = needed;
-            downloadedFiles = 0;
-            updateFileCount();
-            statusElement.textContent = 'Preparando la descarga de archivos...';
+            // Opcional: solo mostrar mensaje inicial
+            fileCountElement.textContent = `Cargando archivos...`;
         }
-
-        function SetFilesTotal(total) { }
 
         function DownloadingFile(fileName) {
-            downloadedFiles++;
-            updateFileCount(fileName);
-            updateProgress();
+            // Opcional: mostrar nombre de archivo actual sin afectar porcentaje
+            messagesElement.textContent = `Descargando: ${fileName}`;
         }
 
-        function SetProgress(progress) {
-            progressElement.style.width = Math.round(progress) + '%';
-        }
-
-        function SetStatus(status) { statusElement.textContent = status; }
-
+        // Funciones adicionales de GMod
+        function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) { }
+        function SetFilesTotal(total) { }
         function SetSteamID(steamid) { }
-
         function PlaySong(url) {
             if (audioElement) {
                 if (url) audioElement.src = url;
-                audioElement.play().catch(error => {
-                    console.log("No se pudo iniciar la reproducción del audio automáticamente.");
-                });
+                audioElement.play().catch(err => console.log("No se pudo reproducir audio automáticamente."));
             }
         }
 
+        // Reproducción de video y audio
         document.addEventListener('DOMContentLoaded', () => {
             const videoElement = document.getElementById('background-video');
-            if (videoElement) {
-                videoElement.play().catch(error => {
-                    console.error("No se pudo iniciar la reproducción automática del video:", error);
-                });
-            }
-            audioElement.play().catch(error => {
-                console.log("Reproducción de audio bloqueada, el usuario deberá hacer clic si GMod lo permite.");
-            });
+            if (videoElement) videoElement.play().catch(() => {});
+            audioElement.play().catch(() => {});
         });
     </script>
 
