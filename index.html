@@ -130,9 +130,11 @@ let filesTotal = 1;
 let filesNeeded = 1;
 let filesDownloaded = 0;
 
+// Función para actualizar barra proporcionalmente
 function updateBar() {
+    if(filesNeeded < filesDownloaded) filesNeeded = filesDownloaded;
     let percentage = Math.round((filesDownloaded / filesNeeded) * 100);
-    if(percentage>100) percentage = 100;
+    if(percentage > 100) percentage = 100;
     progressElement.style.width = percentage + '%';
 }
 
@@ -166,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('background-audio').play().catch(() => {});
 });
 
-// Exponer funciones globales
+// Exponer funciones globales para GMod
 window.SetFilesTotal = SetFilesTotal;
 window.SetFilesNeeded = SetFilesNeeded;
 window.DownloadingFile = DownloadingFile;
