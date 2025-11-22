@@ -1,189 +1,177 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garry's Mod Loading Screen - Video Background</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMod Loading Screen - KLoad</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+:root {
+--gmod-primary: #f59e0b;
+--gmod-text-shadow: 0 0 15px rgba(0, 0, 0, 0.75);
+}
 
-        :root {
-            --gmod-primary: #f59e0b;
-            --gmod-text-shadow: 0 0 15px rgba(0, 0, 0, 0.75);
-        }
+body {
+font-family: 'Inter', sans-serif;
+margin: 0;
+overflow: hidden;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+background-color: #000;
+}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #000;
-        }
+#video-container {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: -1;
+overflow: hidden;
+}
 
-        #video-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
+#background-video {
+position: absolute;
+top: 50%;
+left: 50%;
+min-width: 100%;
+min-height: 100%;
+width: auto;
+height: auto;
+transform: translate(-50%, -50%);
+}
 
-        #background-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translateX(-50%) translateY(-50%);
-        }
+#loading-overlay {
+position: relative;
+z-index: 10;
+width: 90%;
+max-width: 700px;
+color: #ffffff;
+text-align: center;
+}
 
-        #loading-overlay {
-            position: relative;
-            z-index: 10;
-            width: 90%;
-            max-width: 700px;
-            color: #ffffff;
-            text-align: center;
-        }
+.status {
+font-size: 1.5rem;
+font-weight: 700;
+text-shadow: var(--gmod-text-shadow);
+margin-bottom: 0.5rem;
+min-height: 24px;
+}
 
-        .status {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-shadow: var(--gmod-text-shadow);
-            margin-bottom: 0.5rem;
-            min-height: 24px;
-        }
+#loading-bar-outer {
+width: 100%;
+height: 10px;
+background-color: rgba(255, 255, 255, 0.2);
+border-radius: 5px;
+overflow: hidden;
+margin-top: 1rem;
+}
 
-        .messages {
-            font-size: 1rem;
-            font-weight: 400;
-            text-shadow: var(--gmod-text-shadow);
-            margin-top: 1.5rem;
-            opacity: 0.8;
-            min-height: 16px;
-        }
+.loading-bar {
+height: 100%;
+width: 0%;
+background-color: var(--gmod-primary);
+border-radius: 5px;
+transition: width 0.1s linear;
+}
 
-        #loading-bar-outer {
-            width: 100%;
-            height: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-        }
+.messages {
+font-size: 1rem;
+font-weight: 400;
+text-shadow: var(--gmod-text-shadow);
+margin-top: 1.5rem;
+opacity: 0.8;
+min-height: 16px;
+} </style>
 
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--gmod-primary);
-            border-radius: 5px;
-            transition: width 0.1s linear;
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Video de fondo -->
-    <div id="video-container">
-        <video
-            id="background-video"
-            autoplay
-            loop
-            muted
-            playsinline
-            preload="auto"
-            poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando..."
-        >
-            <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted_hd.webm" type="video/webm">
-            Tu navegador no soporta el tag de video.
-        </video>
+<div id="video-container">
+    <video id="background-video" autoplay loop muted playsinline preload="auto" poster="https://placehold.co/1920x1080/000000/ffffff?text=Cargando...">
+        <source src="https://epicsans3443-boop.github.io/LoadingscreenVideoTest1/epic_hns_video_muted_hd.webm" type="video/webm">
+        Tu navegador no soporta el tag de video.
+    </video>
+</div>
+
+<audio id="background-audio" autoplay loop>
+    <source src="./epic_hns_video_audio.mp3" type="audio/mpeg">
+    <source src="./epic_hns_video_audio.ogg" type="audio/ogg">
+</audio>
+
+<div id="loading-overlay">
+    <h1 class="text-4xl sm:text-6xl font-black mb-10 text-cyan-400" style="text-shadow: 0 0 20px rgba(0,0,0,1);">
+        EPIC'S <span class="text-white">HIDE AND SEEK</span>
+    </h1>
+
+```
+<div class="bg-gray-800/80 p-6 rounded-xl shadow-2xl">
+    <p class="status" id="loading-status">Inicializando...</p>
+    <div id="loading-bar-outer">
+        <div class="loading-bar" id="loading-progress"></div>
     </div>
+    <p class="messages" id="loading-messages">¡Prepárate para la acción!</p>
+</div>
+```
 
-    <!-- Audio -->
-    <audio id="background-audio" autoplay loop>
-        <source src="./epic_hns_video_audio.mp3" type="audio/mpeg">
-        <source src="./epic_hns_video_audio.ogg" type="audio/ogg">
-    </audio>
+</div>
 
-    <!-- Overlay -->
-    <div id="loading-overlay">
-        <h1 class="text-4xl sm:text-6xl font-black mb-10 text-cyan-400" style="text-shadow: 0 0 20px rgba(0,0,0,1);">
-            EPIC'S <span class="text-white">HIDE AND SEEK</span>
-        </h1>
+<script>
+const progressElement = document.getElementById('loading-progress');
+const statusElement = document.getElementById('loading-status');
+const messagesElement = document.getElementById('loading-messages');
 
-        <div class="bg-gray-800/80 p-6 rounded-xl shadow-2xl">
-            <p class="status" id="loading-status">Inicializando...</p>
+let filesTotal = 1;
+let filesNeeded = 1;
+let filesDownloaded = 0;
 
-            <div id="loading-bar-outer">
-                <div class="loading-bar" id="loading-progress"></div>
-            </div>
+function updateBar() {
+    let percentage = Math.round((filesDownloaded / filesNeeded) * 100);
+    if(percentage>100) percentage = 100;
+    progressElement.style.width = percentage + '%';
+}
 
-            <p class="text-sm mt-3 opacity-75" id="file-needed-count">Cargando...</p>
-            <p class="messages" id="loading-messages">¡Prepárate para la acción!</p>
-        </div>
-    </div>
+// Funciones que GMod llama
+function SetFilesTotal(total) {
+    filesTotal = total || 1;
+    filesNeeded = total;
+    updateBar();
+}
 
-    <script>
-        let progress = 0;
-        const progressElement = document.getElementById('loading-progress');
-        const statusElement = document.getElementById('loading-status');
-        const messagesElement = document.getElementById('loading-messages');
+function SetFilesNeeded(needed) {
+    filesNeeded = needed || 1;
+    updateBar();
+}
 
-        // Actualiza barra suavemente
-        function updateBar(target) {
-            let step = 0.5; // velocidad de llenado
-            let interval = setInterval(() => {
-                if(progress >= target) {
-                    progress = target;
-                    clearInterval(interval);
-                } else {
-                    progress += step;
-                }
-                progressElement.style.width = progress + '%';
-            }, 20);
-        }
+function DownloadingFile(fileName) {
+    filesDownloaded++;
+    messagesElement.textContent = `Descargando: ${fileName}`;
+    updateBar();
+}
 
-        // Funciones que GMod llama con WorkshopDL
-        function SetStatus(text) {
-            statusElement.textContent = text;
+function SetStatusChanged(status) {
+    statusElement.textContent = status;
+    if(status.toLowerCase().includes("finalizando")) filesDownloaded = filesNeeded;
+    updateBar();
+}
 
-            // Porcentaje aproximado según texto
-            let target = 0;
-            text = text.toLowerCase();
-            if(text.includes("workshop")) target = 50;
-            else if(text.includes("mapa")) target = 80;
-            else if(text.includes("finalizando")) target = 100;
+// Reproducir video y audio
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('background-video').play().catch(() => {});
+    document.getElementById('background-audio').play().catch(() => {});
+});
 
-            updateBar(target);
-        }
-
-        function DownloadingFile(fileName) {
-            messagesElement.textContent = `Descargando: ${fileName}`;
-        }
-
-        // Funciones vacías para compatibilidad
-        function SetFilesTotal() {}
-        function SetFilesNeeded() {}
-        function GameDetails() {}
-        function SetSteamID() {}
-        function PlaySong(url) {}
-
-        // Reproducir video y audio
-        document.addEventListener('DOMContentLoaded', () => {
-            const video = document.getElementById('background-video');
-            video.play().catch(() => {});
-            const audio = document.getElementById('background-audio');
-            audio.play().catch(() => {});
-        });
-    </script>
+// Exponer funciones globales
+window.SetFilesTotal = SetFilesTotal;
+window.SetFilesNeeded = SetFilesNeeded;
+window.DownloadingFile = DownloadingFile;
+window.SetStatusChanged = SetStatusChanged;
+</script>
 
 </body>
 </html>
