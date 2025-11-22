@@ -77,7 +77,7 @@ height: 100%;
 width: 0%;
 background-color: var(--gmod-primary);
 border-radius: 5px;
-transition: width 0.1s linear;
+transition: width 0.2s linear;
 }
 
 .messages {
@@ -126,40 +126,31 @@ const progressElement = document.getElementById('loading-progress');
 const statusElement = document.getElementById('loading-status');
 const messagesElement = document.getElementById('loading-messages');
 
-let filesTotal = 1;
-let filesNeeded = 1;
-let filesDownloaded = 0;
+let KLoadProgress = 0;
 
-// Función para actualizar barra proporcionalmente
-function updateBar() {
-    if(filesNeeded < filesDownloaded) filesNeeded = filesDownloaded;
-    let percentage = Math.round((filesDownloaded / filesNeeded) * 100);
-    if(percentage > 100) percentage = 100;
-    progressElement.style.width = percentage + '%';
+// Actualiza la barra proporcionalmente
+function setProgress(pct) {
+    KLoadProgress = Math.max(KLoadProgress, pct); // No retrocede
+    if (KLoadProgress > 100) KLoadProgress = 100;
+    progressElement.style.width = KLoadProgress + '%';
 }
 
-// Funciones que GMod llama
-function SetFilesTotal(total) {
-    filesTotal = total || 1;
-    filesNeeded = total;
-    updateBar();
-}
+// Funciones que Garry's Mod llama
+function SetStatusChanged(status) {
+    statusElement.textContent = status;
 
-function SetFilesNeeded(needed) {
-    filesNeeded = needed || 1;
-    updateBar();
+    // Estimar porcentaje según estado
+    let pct = 0;
+    const lower = status.toLowerCase();
+    if (lower.includes("workshop")) pct = 50;
+    else if (lower.includes("mapa")) pct = 80;
+    else if (lower.includes("finalizando")) pct = 100;
+
+    setProgress(pct);
 }
 
 function DownloadingFile(fileName) {
-    filesDownloaded++;
     messagesElement.textContent = `Descargando: ${fileName}`;
-    updateBar();
-}
-
-function SetStatusChanged(status) {
-    statusElement.textContent = status;
-    if(status.toLowerCase().includes("finalizando")) filesDownloaded = filesNeeded;
-    updateBar();
 }
 
 // Reproducir video y audio
@@ -169,10 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Exponer funciones globales para GMod
-window.SetFilesTotal = SetFilesTotal;
-window.SetFilesNeeded = SetFilesNeeded;
-window.DownloadingFile = DownloadingFile;
 window.SetStatusChanged = SetStatusChanged;
+window.DownloadingFile = DownloadingFile;
+window.SetProgress = setProgress;
 </script>
 
 </body>
